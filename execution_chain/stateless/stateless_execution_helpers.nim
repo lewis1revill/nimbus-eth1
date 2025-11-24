@@ -91,6 +91,14 @@ proc statelessProcessBlockJson*(
     blkObject = ?BlockObject.decodeJson(blkJson)
   statelessProcessBlock(witness, com, blkObject.toBlock())
 
+proc statelessProcessBlockJson*(
+    witnessJson: string, blkJson: string
+): Result[void, string] =
+  let
+    witness = ?ExecutionWitness.decodeJson(witnessJson)
+    blkObject = ?BlockObject.decodeJson(blkJson)
+  statelessProcessBlock(witness, MainNet, blkObject.toBlock())
+
 proc statelessProcessBlockJsonFiles*(
     witnessJsonFilePath: string, com: CommonRef, blockJsonFilePath: string
 ): Result[void, string] =
@@ -98,3 +106,42 @@ proc statelessProcessBlockJsonFiles*(
     witnessJson = ?readFileToStr(witnessJsonFilePath)
     blkJson = ?readFileToStr(blockJsonFilePath)
   statelessProcessBlockJson(witnessJson, com, blkJson)
+
+proc statelessProcessBlockJsonFiles*(
+    witnessJsonFilePath: string, blockJsonFilePath: string
+): Result[void, string] =
+  let
+    witnessJson = ?readFileToStr(witnessJsonFilePath)
+    blkJson = ?readFileToStr(blockJsonFilePath)
+  statelessProcessBlockJson(witnessJson, blkJson)
+
+proc main() = 
+  echo "Input block as JSON"
+  var blockIn = ""
+  while true:
+    try:
+      let ch = stdin.readChar();
+      blockIn.add(ch)
+      if ch == '}':
+        break
+    except IOError:
+      echo "Failed"
+      break
+
+  echo "Input witness as JSON"
+  var witnessIn = ""
+  while true:
+    try:
+      let ch = stdin.readChar();
+      witnessIn.add(ch)
+      if ch == '}':
+        break
+    except IOError:
+      echo "Failed"
+      break
+
+  statelessProcessBlockJson(witnessIn, blockIn).isOkOr:
+    echo error
+
+when isMainModule:
+  main()
