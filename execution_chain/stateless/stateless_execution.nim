@@ -12,15 +12,23 @@
 import
   std/tables,
   results,
-  eth/common/[headers, blocks],
-  eth/rlp,
-  ../common/common,
   ../db/ledger,
   ../evm/[types, state],
   ../core/executor/process_block,
   ./[witness_types, witness_verification]
 
-export witness_types, common, headers, blocks, results
+from eth/rlp/writer import computeRlpHash
+from eth/rlp import RlpError
+from eth/common/blocks import Block
+from ../common/hardforks import ChainConfig
+from ../common/common import CommonRef, new
+from ../common/chain_config import chainConfigForNetwork
+from ../db/core_db/memory_only import newCoreDbRef
+from ../db/core_db import DefaultDbMemory
+from ../db/core_db/base import baseTxFrame, putSubtrie, getStateRoot
+from ../db/core_db/core_apps import setCodeByHash, addBlockNumberToHashLookup
+
+export witness_types, results
 
 proc statelessProcessBlock*(
     witness: ExecutionWitness, com: CommonRef, blk: Block

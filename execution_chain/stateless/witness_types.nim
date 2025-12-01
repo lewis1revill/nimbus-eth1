@@ -9,9 +9,9 @@
 
 {.push raises: [], gcsafe.}
 
-import eth/common, eth/rlp, results
-
-export common, results
+import eth/common/hashes, eth/common/hashes_rlp
+import eth/rlp
+import results
 
 type
   Witness* = object
