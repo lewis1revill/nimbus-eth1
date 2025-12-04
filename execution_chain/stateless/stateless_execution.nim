@@ -9,17 +9,14 @@
 
 {.push raises: [], gcsafe.}
 
-import
-  std/tables,
-  results,
-  ../db/ledger,
-  ../evm/[types, state],
-  ../core/executor/process_block,
-  ./[witness_types, witness_verification]
+import results
 
+from std/tables import Table, `[]=`
 from eth/rlp/writer import computeRlpHash
 from eth/rlp import RlpError
 from eth/common/blocks import Block
+from eth/common/hashes import Hash32, keccak256, `==`
+from eth/common/base import NetworkId
 from ../common/hardforks import ChainConfig
 from ../common/common import CommonRef, new
 from ../common/chain_config import chainConfigForNetwork
@@ -27,8 +24,14 @@ from ../db/core_db/memory_only import newCoreDbRef
 from ../db/core_db import DefaultDbMemory
 from ../db/core_db/base import baseTxFrame, putSubtrie, getStateRoot
 from ../db/core_db/core_apps import setCodeByHash, addBlockNumberToHashLookup
+from ../db/ledger import getStateRoot
+from ../evm/types import BaseVMState
+from ../evm/state import init
+from ../core/executor/process_block import processBlock
+from ./witness_types import ExecutionWitness
+from ./witness_verification import verifyHeaders, verifyState
 
-export witness_types, results
+export results
 
 proc statelessProcessBlock*(
     witness: ExecutionWitness, com: CommonRef, blk: Block
