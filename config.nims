@@ -103,6 +103,11 @@ elif defined(linux) and defined(arm64):
   # clang can't handle "-march=native"
   switch("passC", "-march=armv8-a")
   switch("passL", "-march=armv8-a")
+elif defined(zisk):
+  switch("passC", "-march=rv64ima")
+  switch("passC", "-mcmodel=medany")
+  switch("passL", "-march=rv64ima")
+  switch("passL", "-Wl,-Triscv64ima_zisk_zkvm_elf_linker_script.ld")
 else:
   switch("passC", "-march=native")
   switch("passL", "-march=native")
@@ -133,7 +138,7 @@ switch("passL", "-fno-omit-frame-pointer")
 switch("define", "nim_compiler_path=" & currentDir & "env.sh nim")
 switch("define", "withoutPCRE")
 
-when not defined(disable_libbacktrace):
+when not defined(disable_libbacktrace) and not defined(zisk):
   --define:nimStackTraceOverride
   switch("import", "libbacktrace")
 else:
