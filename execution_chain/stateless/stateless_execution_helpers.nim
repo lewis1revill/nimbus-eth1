@@ -45,6 +45,7 @@ proc statelessProcessBlockRlp*(
   let
     witness = ?ExecutionWitness.decodeRlp(witnessRlpBytes)
     blk = ?Block.decodeRlp(blkRlpBytes)
+  echo "Decoded"
   statelessProcessBlock(witness, 1.u256, blk)
 
 proc statelessProcessBlockRlp*(
@@ -53,6 +54,7 @@ proc statelessProcessBlockRlp*(
   let
     witnessRlpBytes = ?witnessRlpStr.toBytes()
     blkRlpBytes = ?blkRlpStr.toBytes()
+  echo "Decoded"
   statelessProcessBlockRlp(witnessRlpBytes, blkRlpBytes)
 
 proc main() = 
@@ -60,10 +62,10 @@ proc main() =
   var blockIn = ""
   while true:
     try:
-      let ch = stdin.readChar();
-      blockIn.add(ch)
-      if ch == '}':
+      let line = stdin.readChar();
+      if line == '|':
         break
+      blockIn = blockIn & line
     except IOError:
       echo "Failed"
       break
@@ -72,16 +74,20 @@ proc main() =
   var witnessIn = ""
   while true:
     try:
-      let ch = stdin.readChar();
-      witnessIn.add(ch)
-      if ch == '}':
+      let line = stdin.readChar();
+      if line == '|':
         break
+      witnessIn = witnessIn & line
     except IOError:
       echo "Failed"
       break
 
+  echo blockIn
+  echo witnessIn
+
   statelessProcessBlockRlp(witnessIn, blockIn).isOkOr:
     echo error
+  echo "Success"
 
 when isMainModule:
   main()
